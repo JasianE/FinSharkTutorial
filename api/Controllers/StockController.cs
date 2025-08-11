@@ -28,14 +28,24 @@ namespace api.controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var stocks = await _stockRepo.GetAllAsync();
             var stockDto = stocks.Select(s => s.ToStockDto()); // we got stuff out of the database, asyn cadded is we now wait for the yield
                                           //The point of the tolist is to have deferred execution,
             return Ok(stockDto); //creates an ok object with the content we want
         }// the async will make a task, and will then insert the value from the result of the yield
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")] // this validation wont be seen on swagger, since it auto filters from the front-end, but accessing it directly will result in an eror (url)
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var stock = await _stockRepo.GetByIdAsync(id); //each method i guess has an async version
 
             if (stock == null)
@@ -49,6 +59,11 @@ namespace api.controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] StockRequestDto stockDto) // we also need to make a CREATE DTO / RECEIVING DTO since we don't want all the info available for a stock from the user.
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var stockModel = stockDto.ToStockFromRequestDto();
             await _stockRepo.CreateAsync(stockModel); //auto generates the id for us!
 
@@ -56,9 +71,14 @@ namespace api.controllers
             //follows rest back pracitces (client can immediately access new resource)y
         }
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDTO updateDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var stockModel = await _stockRepo.UpdateAsync(id, updateDto); // return the item with the same id
 
             if (stockModel == null)
@@ -69,10 +89,15 @@ namespace api.controllers
             return Ok(stockModel.ToStockDto());
         }
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
 
         public async Task<IActionResult> DeleteStock([FromRoute] int id) //
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
             Stock? stock_model = await _stockRepo.DeleteAsync(id);
 
             if (stock_model == null)
