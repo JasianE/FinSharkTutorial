@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Dtos.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -26,14 +27,14 @@ namespace api.controllers
             _stockRepo = stockRepo;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query) // we get this from our query, queryobject will wrap the query parameters in a nice object
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
             var stockDto = stocks.Select(s => s.ToStockDto()); // we got stuff out of the database, asyn cadded is we now wait for the yield
                                           //The point of the tolist is to have deferred execution,
             return Ok(stockDto); //creates an ok object with the content we want
@@ -97,7 +98,7 @@ namespace api.controllers
             {
                 return BadRequest(ModelState);
             }
-            
+
             Stock? stock_model = await _stockRepo.DeleteAsync(id);
 
             if (stock_model == null)
