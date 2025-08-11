@@ -53,8 +53,17 @@ namespace api.Repository
             {
                 stocks = stocks.Where(stock => stock.Symbol.Contains(query.Symbol));
             }
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {//compares strings, its just an option for the .equals method to tell it how to compare
+                    stocks = query.IsDecending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol); // just says to sort by symbol instead.
+                }
+            }
 
-            return await stocks.ToListAsync();
+            var skipNumber = (query.PageNumber - 1) * query.PageSize; //if we have page 3, we skip the first 2 pages (multiply by page size.)
+
+            return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync(); // this establishes our pagination, we take the page amount that we have, since we only want to be showing a page's worth of stocks / content anyway.
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
