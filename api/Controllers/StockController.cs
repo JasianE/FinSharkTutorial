@@ -9,6 +9,7 @@ using api.Interfaces;
 using api.Mappers;
 using api.Models;
 using api.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,7 @@ namespace api.controllers
             _stockRepo = stockRepo;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query) // we get this from our query, queryobject will wrap the query parameters in a nice object
         {
             if (!ModelState.IsValid)
@@ -36,7 +38,7 @@ namespace api.controllers
 
             var stocks = await _stockRepo.GetAllAsync(query);
             var stockDto = stocks.Select(s => s.ToStockDto()); // we got stuff out of the database, asyn cadded is we now wait for the yield
-                                          //The point of the tolist is to have deferred execution,
+                                                               //The point of the tolist is to have deferred execution,
             return Ok(stockDto); //creates an ok object with the content we want
         }// the async will make a task, and will then insert the value from the result of the yield
         [HttpGet("{id:int}")] // this validation wont be seen on swagger, since it auto filters from the front-end, but accessing it directly will result in an eror (url)
