@@ -21,9 +21,25 @@ namespace api.Data
 
         public DbSet<Stock> Stock { get; set; } // manipulating the whole table
         public DbSet<Comment> Comments { get; set; } //these are our tables...?
+        public DbSet<Portfolio> Portfolios { get; set; }
         protected override void OnModelCreating(ModelBuilder builder) // we need to see the db with roles, we need to do a user role and an admin role. 
         {
             base.OnModelCreating(builder); // what does this do?
+
+            //Configure the join table.
+            builder.Entity<Portfolio>(item => item.HasKey(portfolio => new { portfolio.AppUserId, portfolio.StockId }));
+
+            builder.Entity<Portfolio>()
+            .HasOne(user => user.AppUser)
+            .WithMany(user => user.Portfolios)
+            .HasForeignKey(portfolio => portfolio.AppUserId);
+
+            builder.Entity<Portfolio>()
+            .HasOne(user => user.Stock)
+            .WithMany(user => user.Portfolios)
+            .HasForeignKey(portfolio => portfolio.StockId);
+
+
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole
