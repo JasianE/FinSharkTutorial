@@ -94,6 +94,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>(); // another dependency injection, now we can give out everything here.
+builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>(); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

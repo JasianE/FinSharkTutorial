@@ -39,6 +39,7 @@ namespace api.Data
             .WithMany(user => user.Portfolios)
             .HasForeignKey(portfolio => portfolio.StockId);
 
+            // w/ this many-to-many relationship, i wont be storing duplicate info for user or movies, but instead storing whatever relationships between the movies and users and doing that to keep track of them.
 
             List<IdentityRole> roles = new List<IdentityRole>
             {
