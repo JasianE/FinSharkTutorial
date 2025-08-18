@@ -18,6 +18,13 @@ namespace api.Repository
             _context = context;
         }
 
+        public async Task<Portfolio> CreatePortfolioAsync(Portfolio portfolio)
+        {
+            await _context.Portfolios.AddAsync(portfolio);
+            await _context.SaveChangesAsync();
+            return portfolio;
+        }
+
         public async Task<List<Stock>> GetUserPortfolio(AppUser user)
         {
 
@@ -33,8 +40,6 @@ namespace api.Repository
                 MarketCap = stock.Stock.MarketCap
             }).ToListAsync();
 
-            
-            return new List<Stock>();
         }
     }
 }
